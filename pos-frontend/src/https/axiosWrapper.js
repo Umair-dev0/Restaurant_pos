@@ -6,7 +6,7 @@ const defaultHeader = {
 };
 
 export const axiosWrapper = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
+  baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:8000",
   withCredentials: true,
   headers: { ...defaultHeader },
 });

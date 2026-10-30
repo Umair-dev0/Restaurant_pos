@@ -1,9 +1,7 @@
-import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { formatDate, getAvatarName } from "../../utils";
 
 const CustomerInfo = () => {
-  const [dateTime, setDateTime] = useState(new Date());
   const customerData = useSelector((state) => state.customer);
 
   return (
@@ -16,12 +14,12 @@ const CustomerInfo = () => {
           #{customerData.orderId || "N/A"} / Dine in
         </p>
         <p className="text-xs text-[#ababab] font-medium mt-2">
-          {formatDate(dateTime)}
+          {formatDate(new Date())}
         </p>
       </div>
-      <button className="bg-[#f6b100] p-3 text-xl font-bold rounded-lg">
+      <span className="bg-[#f6b100] p-3 text-xl font-bold rounded-lg">
         {getAvatarName(customerData.customerName) || "CN"}
-      </button>
+      </span>
     </div>
   );
 };

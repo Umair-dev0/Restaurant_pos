@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { register } from "../../https";
 import { useMutation } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
@@ -43,8 +43,10 @@ const Register = ({setIsRegister}) => {
       }, 1500);
     },
     onError: (error) => {
-      const { response } = error;
-      const message = response.data.message;
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Registration failed. Check that the backend is running and try again.";
       enqueueSnackbar(message, { variant: "error" });
     },
   });
@@ -90,7 +92,7 @@ const Register = ({setIsRegister}) => {
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
-              type="number"
+              type="tel"
               name="phone"
               value={formData.phone}
               onChange={handleChange}

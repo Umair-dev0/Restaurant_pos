@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import BottomNav from "../components/shared/BottomNav";
 import BackButton from "../components/shared/BackButton";
 import { MdRestaurantMenu } from "react-icons/md";
@@ -17,9 +17,9 @@ const Menu = () => {
   const customerData = useSelector((state) => state.customer);
 
   return (
-    <section className="bg-[#1f1f1f] h-[calc(100vh-5rem)] overflow-hidden flex gap-3">
+    <section className="min-h-[calc(100vh-4rem)] bg-[#1f1f1f] flex flex-col lg:flex-row gap-3 pb-20">
       {/* Left Div */}
-      <div className="flex-[3]">
+      <div className="min-w-0 flex-[3]">
         <div className="flex items-center justify-between px-10 py-4">
           <div className="flex items-center gap-4">
             <BackButton />
@@ -45,7 +45,7 @@ const Menu = () => {
         <MenuContainer />
       </div>
       {/* Right Div */}
-      <div className="flex-[1] bg-[#1a1a1a] mt-4 mr-3 h-[780px] rounded-lg pt-2">
+      <div className="w-full lg:w-auto lg:flex-[1] bg-[#1a1a1a] mt-4 lg:mr-3 rounded-lg pt-2 lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
         {/* Customer Info */}
         <CustomerInfo />
         <hr className="border-[#2a2a2a] border-t-2" />

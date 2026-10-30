@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query"
 import { login } from "../../https/index"
 import { enqueueSnackbar } from "notistack";
@@ -34,8 +34,10 @@ const Login = () => {
           navigate("/");
       },
       onError: (error) => {
-        const { response } = error;
-        enqueueSnackbar(response.data.message, { variant: "error" });
+        enqueueSnackbar(
+          error.response?.data?.message || error.message || "Sign in failed.",
+          { variant: "error" }
+        );
       }
     })
 

@@ -5,11 +5,15 @@ const userSchema = new mongoose.Schema({
     name : {
         type: String,
         required: true,
+        trim: true
     },
 
     email : {
         type: String,
         required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
         validate: {
             validator: function (v) {
                 return /\S+@\S+\.\S+/.test(v);
@@ -19,30 +23,33 @@ const userSchema = new mongoose.Schema({
     },
 
     phone: {
-        type : Number,
+        type : String,
         required: true,
+        trim: true,
         validate: {
             validator: function (v) {
-                return /\d{10}/.test(v);
+                return /^\+?\d{10,15}$/.test(v);
             },
-            message : "Phone number must be a 10-digit number!"
+            message : "Phone number must contain 10 to 15 digits."
         }
     },
 
     password: {
         type: String,
         required: true,
+        minlength: 8
     },
 
     role: {
         type: String,
-        required: true
+        required: true,
+        enum: ["Waiter", "Cashier", "Admin"]
     }
 }, { timestamps : true })
 
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
     if(!this.isModified('password')){
-        next();
+        return;
     }
 
     const salt = await bcrypt.genSalt(10);

@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
 
 const paymentSchema = new mongoose.Schema({
-    paymentId: String,
-    orderId: String,
-    amount: Number,
-    currency: String,
-    status: String,
+    paymentId: { type: String, unique: true, sparse: true },
+    orderId: { type: String, required: true, unique: true, sparse: true },
+    amount: { type: Number, required: true },
+    currency: { type: String, default: "INR" },
+    status: { type: String, required: true },
+    posOrder: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
     method: String,
     email: String,
     contact: String,

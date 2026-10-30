@@ -1,0 +1,268 @@
+[
+  {
+    "name": "Starters",
+    "bgColor": "#b73e3e",
+    "icon": "🍲",
+    "items": [
+      {
+        "name": "Paneer Tikka",
+        "price": 250,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Chicken Tikka",
+        "price": 300,
+        "category": "Non-Vegetarian"
+      },
+      {
+        "name": "Tandoori Chicken",
+        "price": 350,
+        "category": "Non-Vegetarian"
+      },
+      {
+        "name": "Samosa",
+        "price": 100,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Aloo Tikki",
+        "price": 120,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Hara Bhara Kebab",
+        "price": 220,
+        "category": "Vegetarian"
+      }
+    ]
+  },
+  {
+    "name": "Main Course",
+    "bgColor": "#5b45b0",
+    "icon": "🍛",
+    "items": [
+      {
+        "name": "Butter Chicken",
+        "price": 400,
+        "category": "Non-Vegetarian"
+      },
+      {
+        "name": "Paneer Butter Masala",
+        "price": 350,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Chicken Biryani",
+        "price": 450,
+        "category": "Non-Vegetarian"
+      },
+      {
+        "name": "Dal Makhani",
+        "price": 180,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Kadai Paneer",
+        "price": 300,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Rogan Josh",
+        "price": 500,
+        "category": "Non-Vegetarian"
+      }
+    ]
+  },
+  {
+    "name": "Beverages",
+    "bgColor": "#7f167f",
+    "icon": "🍹",
+    "items": [
+      {
+        "name": "Masala Chai",
+        "price": 50,
+        "category": "Hot"
+      },
+      {
+        "name": "Lemon Soda",
+        "price": 80,
+        "category": "Cold"
+      },
+      {
+        "name": "Mango Lassi",
+        "price": 120,
+        "category": "Cold"
+      },
+      {
+        "name": "Cold Coffee",
+        "price": 150,
+        "category": "Cold"
+      },
+      {
+        "name": "Fresh Lime Water",
+        "price": 60,
+        "category": "Cold"
+      },
+      {
+        "name": "Iced Tea",
+        "price": 100,
+        "category": "Cold"
+      }
+    ]
+  },
+  {
+    "name": "Soups",
+    "bgColor": "#735f32",
+    "icon": "🍜",
+    "items": [
+      {
+        "name": "Tomato Soup",
+        "price": 120,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Sweet Corn Soup",
+        "price": 130,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Hot & Sour Soup",
+        "price": 140,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Chicken Clear Soup",
+        "price": 160,
+        "category": "Non-Vegetarian"
+      },
+      {
+        "name": "Mushroom Soup",
+        "price": 150,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Lemon Coriander Soup",
+        "price": 110,
+        "category": "Vegetarian"
+      }
+    ]
+  },
+  {
+    "name": "Desserts",
+    "bgColor": "#1d2569",
+    "icon": "🍰",
+    "items": [
+      {
+        "name": "Gulab Jamun",
+        "price": 100,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Kulfi",
+        "price": 150,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Chocolate Lava Cake",
+        "price": 250,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Ras Malai",
+        "price": 180,
+        "category": "Vegetarian"
+      }
+    ]
+  },
+  {
+    "name": "Pizzas",
+    "bgColor": "#285430",
+    "icon": "🍕",
+    "items": [
+      {
+        "name": "Margherita Pizza",
+        "price": 350,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Veg Supreme Pizza",
+        "price": 400,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Pepperoni Pizza",
+        "price": 450,
+        "category": "Non-Vegetarian"
+      }
+    ]
+  },
+  {
+    "name": "Alcoholic Drinks",
+    "bgColor": "#b73e3e",
+    "icon": "🍺",
+    "items": [
+      {
+        "name": "Beer",
+        "price": 200,
+        "category": "Alcoholic"
+      },
+      {
+        "name": "Whiskey",
+        "price": 500,
+        "category": "Alcoholic"
+      },
+      {
+        "name": "Vodka",
+        "price": 450,
+        "category": "Alcoholic"
+      },
+      {
+        "name": "Rum",
+        "price": 350,
+        "category": "Alcoholic"
+      },
+      {
+        "name": "Tequila",
+        "price": 600,
+        "category": "Alcoholic"
+      },
+      {
+        "name": "Cocktail",
+        "price": 400,
+        "category": "Alcoholic"
+      }
+    ]
+  },
+  {
+    "name": "Salads",
+    "bgColor": "#5b45b0",
+    "icon": "🥗",
+    "items": [
+      {
+        "name": "Caesar Salad",
+        "price": 200,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Greek Salad",
+        "price": 250,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Fruit Salad",
+        "price": 150,
+        "category": "Vegetarian"
+      },
+      {
+        "name": "Chicken Salad",
+        "price": 300,
+        "category": "Non-Vegetarian"
+      },
+      {
+        "name": "Tuna Salad",
+        "price": 350,
+        "category": "Uncategorized"
+      }
+    ]
+  }
+]

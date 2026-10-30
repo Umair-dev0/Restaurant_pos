@@ -19,6 +19,35 @@ A full-featured **Restaurant POS System** built using the **MERN Stack** to stre
 - 🧾 **Billing & Invoicing**  
   Automatically generate detailed bills and invoices for every order.
 
+## Run locally
+
+1. Start MongoDB, then configure the backend:
+
+   ```powershell
+   cd pos-backend
+   Copy-Item .env.example .env
+   ```
+
+   Set `JWT_SECRET` in `pos-backend/.env` to a new random value (for example, generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`). Configure `MONGODB_URI`, `FRONTEND_URL`, and `TAX_RATE` there as needed. On an empty database, the backend creates the starter menu and the configured number of empty tables once. Menu categories, dishes, prices, tax rate, and table counts are then read from the database or environment rather than frontend demo constants.
+
+2. In `pos-backend`, install dependencies and run the API:
+
+   ```powershell
+   npm install
+   npm run dev
+   ```
+
+3. In a second terminal, configure and run the frontend:
+
+   ```powershell
+   cd pos-frontend
+   Copy-Item .env.example .env
+   npm install
+   npm run dev
+   ```
+
+Cash orders work without a payment gateway. To use online payments, set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in the backend `.env`; checkout receives the public key from the API. The server validates current menu prices and tax, then creates the order and books its table through one API operation.
+
 
 ## 🏗️ **Tech Stack**
 

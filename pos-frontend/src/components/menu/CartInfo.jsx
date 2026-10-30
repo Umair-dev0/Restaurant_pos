@@ -1,6 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { RiDeleteBin2Fill } from "react-icons/ri";
-import { FaNotesMedical } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { removeItem } from "../../redux/slices/cartSlice";
 
@@ -32,7 +31,7 @@ const CartInfo = () => {
           <p className="text-[#ababab] text-sm flex justify-center items-center h-[380px]">Your cart is empty. Start adding items!</p>
         ) : cartData.map((item) => {
           return (
-            <div className="bg-[#1f1f1f] rounded-lg px-4 py-4 mb-2">
+            <div key={item.id} className="bg-[#1f1f1f] rounded-lg px-4 py-4 mb-2">
               <div className="flex items-center justify-between">
                 <h1 className="text-[#ababab] font-semibold tracling-wide text-md">
                   {item.name}
@@ -41,15 +40,14 @@ const CartInfo = () => {
               </div>
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center gap-3">
-                  <RiDeleteBin2Fill
+                  <button
+                    type="button"
                     onClick={() => handleRemove(item.id)}
                     className="text-[#ababab] cursor-pointer"
-                    size={20}
-                  />
-                  <FaNotesMedical
-                    className="text-[#ababab] cursor-pointer"
-                    size={20}
-                  />
+                    aria-label={`Remove ${item.name} from cart`}
+                  >
+                    <RiDeleteBin2Fill size={20} />
+                  </button>
                 </div>
                 <p className="text-[#f5f5f5] text-md font-bold">₹{item.price}</p>
               </div>

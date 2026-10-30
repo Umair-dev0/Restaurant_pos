@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaHome } from "react-icons/fa";
 import { MdOutlineReorder, MdTableBar } from "react-icons/md";
 import { CiCircleMore } from "react-icons/ci";
@@ -7,43 +7,49 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Modal from "./Modal";
 import { useDispatch } from "react-redux";
 import { setCustomer } from "../../redux/slices/customerSlice";
+import { enqueueSnackbar } from "notistack";
 
 const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [guestCount, setGuestCount] = useState(0);
-  const [name, setName] = useState();
-  const [phone, setPhone] = useState();
+  const [guestCount, setGuestCount] = useState(1);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   const increment = () => {
-    if(guestCount >= 6) return;
     setGuestCount((prev) => prev + 1);
   }
   const decrement = () => {
-    if(guestCount <= 0) return;
+    if(guestCount <= 1) return;
     setGuestCount((prev) => prev - 1);
   }
 
   const isActive = (path) => location.pathname === path;
 
   const handleCreateOrder = () => {
+    if (!name.trim() || !phone.trim()) {
+      enqueueSnackbar("Enter the customer name and phone number.", { variant: "warning" });
+      return;
+    }
+
     // send the data to store
-    dispatch(setCustomer({name, phone, guests: guestCount}));
+    dispatch(setCustomer({ name: name.trim(), phone: phone.trim(), guests: guestCount }));
+    closeModal();
     navigate("/tables");
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[#262626] p-2 h-16 flex justify-around">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#262626] p-2 h-16 flex justify-around">
       <button
         onClick={() => navigate("/")}
         className={`flex items-center justify-center font-bold ${
           isActive("/") ? "text-[#f5f5f5] bg-[#343434]" : "text-[#ababab]"
-        } w-[300px] rounded-[20px]`}
+        } flex-1 rounded-[20px]`}
       >
         <FaHome className="inline mr-2" size={20} /> <p>Home</p>
       </button>
@@ -51,7 +57,7 @@ const BottomNav = () => {
         onClick={() => navigate("/orders")}
         className={`flex items-center justify-center font-bold ${
           isActive("/orders") ? "text-[#f5f5f5] bg-[#343434]" : "text-[#ababab]"
-        } w-[300px] rounded-[20px]`}
+        } flex-1 rounded-[20px]`}
       >
         <MdOutlineReorder className="inline mr-2" size={20} /> <p>Orders</p>
       </button>
@@ -59,18 +65,21 @@ const BottomNav = () => {
         onClick={() => navigate("/tables")}
         className={`flex items-center justify-center font-bold ${
           isActive("/tables") ? "text-[#f5f5f5] bg-[#343434]" : "text-[#ababab]"
-        } w-[300px] rounded-[20px]`}
+        } flex-1 rounded-[20px]`}
       >
         <MdTableBar className="inline mr-2" size={20} /> <p>Tables</p>
       </button>
-      <button className="flex items-center justify-center font-bold text-[#ababab] w-[300px]">
+      <button
+        onClick={() => enqueueSnackbar("More options are coming soon.", { variant: "info" })}
+        className="flex items-center justify-center font-bold text-[#ababab] flex-1 rounded-[20px]"
+      >
         <CiCircleMore className="inline mr-2" size={20} /> <p>More</p>
       </button>
 
       <button
         disabled={isActive("/tables") || isActive("/menu")}
         onClick={openModal}
-        className="absolute bottom-6 bg-[#F6B100] text-[#f5f5f5] rounded-full p-4 items-center"
+        className="absolute left-1/2 -translate-x-1/2 -top-7 bg-[#F6B100] text-[#f5f5f5] rounded-full p-4 items-center"
       >
         <BiSolidDish size={40} />
       </button>
@@ -79,24 +88,24 @@ const BottomNav = () => {
         <div>
           <label className="block text-[#ababab] mb-2 text-sm font-medium">Customer Name</label>
           <div className="flex items-center rounded-lg p-3 px-4 bg-[#1f1f1f]">
-            <input value={name} onChange={(e) => setName(e.target.value)} type="text" name="" placeholder="Enter customer name" id="" className="bg-transparent flex-1 text-white focus:outline-none"  />
+            <input value={name} onChange={(e) => setName(e.target.value)} type="text" name="customerName" autoComplete="name" placeholder="Enter customer name" id="customer-name" className="bg-transparent flex-1 text-white focus:outline-none"  />
           </div>
         </div>
         <div>
           <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">Customer Phone</label>
           <div className="flex items-center rounded-lg p-3 px-4 bg-[#1f1f1f]">
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} type="number" name="" placeholder="+91-9999999999" id="" className="bg-transparent flex-1 text-white focus:outline-none"  />
+            <input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" name="customerPhone" autoComplete="tel" placeholder="+91-9999999999" id="customer-phone" className="bg-transparent flex-1 text-white focus:outline-none"  />
           </div>
         </div>
         <div>
           <label className="block mb-2 mt-3 text-sm font-medium text-[#ababab]">Guest</label>
           <div className="flex items-center justify-between bg-[#1f1f1f] px-4 py-3 rounded-lg">
-            <button onClick={decrement} className="text-yellow-500 text-2xl">&minus;</button>
+            <button type="button" onClick={decrement} className="text-yellow-500 text-2xl" aria-label="Remove one guest">&minus;</button>
             <span className="text-white">{guestCount} Person</span>
-            <button onClick={increment} className="text-yellow-500 text-2xl">&#43;</button>
+            <button type="button" onClick={increment} className="text-yellow-500 text-2xl" aria-label="Add one guest">&#43;</button>
           </div>
         </div>
-        <button onClick={handleCreateOrder} className="w-full bg-[#F6B100] text-[#f5f5f5] rounded-lg py-3 mt-8 hover:bg-yellow-700">
+        <button type="button" onClick={handleCreateOrder} className="w-full bg-[#F6B100] text-[#f5f5f5] rounded-lg py-3 mt-8 hover:bg-yellow-700">
           Create Order
         </button>
       </Modal>

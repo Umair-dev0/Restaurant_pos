@@ -59,7 +59,7 @@ function Layout() {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoutes>
+            <ProtectedRoutes requiredRole="Admin">
               <Dashboard />
             </ProtectedRoutes>
           }
@@ -70,11 +70,12 @@ function Layout() {
   );
 }
 
-function ProtectedRoutes({ children }) {
-  const { isAuth } = useSelector((state) => state.user);
+function ProtectedRoutes({ children, requiredRole }) {
+  const { isAuth, role } = useSelector((state) => state.user);
   if (!isAuth) {
     return <Navigate to="/auth" />;
   }
+  if (requiredRole && role !== requiredRole) return <Navigate to="/" replace />;
 
   return children;
 }

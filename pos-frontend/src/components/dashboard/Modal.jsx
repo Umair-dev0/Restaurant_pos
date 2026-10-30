@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { IoMdClose } from "react-icons/io";
 import { useMutation } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { addTable } from "../../https";
 import { enqueueSnackbar } from "notistack"
 
 const Modal = ({ setIsTableModalOpen }) => {
+  const queryClient = useQueryClient();
   const [tableData, setTableData] = useState({
     tableNo: "",
     seats: "",
@@ -18,7 +20,6 @@ const Modal = ({ setIsTableModalOpen }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(tableData);
     tableMutation.mutate(tableData);
   };
 
@@ -31,12 +32,11 @@ const Modal = ({ setIsTableModalOpen }) => {
     onSuccess: (res) => {
         setIsTableModalOpen(false);
         const { data } = res;
+        queryClient.invalidateQueries({ queryKey: ["tables"] });
         enqueueSnackbar(data.message, { variant: "success" })
     },
     onError: (error) => {
-        const { data } = error.response;
-        enqueueSnackbar(data.message, { variant: "error" })
-        console.log(error);
+        enqueueSnackbar(error.response?.data?.message || error.message || "Could not add table.", { variant: "error" })
     }
   })
 
@@ -55,6 +55,7 @@ const Modal = ({ setIsTableModalOpen }) => {
         <div className="flex justify-between item-center mb-4">
           <h2 className="text-[#f5f5f5] text-xl font-semibold">Add Table</h2>
           <button
+            type="button"
             onClick={handleCloseModal}
             className="text-[#f5f5f5] hover:text-red-500"
           >
@@ -72,6 +73,7 @@ const Modal = ({ setIsTableModalOpen }) => {
             <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
               <input
                 type="number"
+                min="1"
                 name="tableNo"
                 value={tableData.tableNo}
                 onChange={handleInputChange}
@@ -87,6 +89,7 @@ const Modal = ({ setIsTableModalOpen }) => {
             <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
               <input
                 type="number"
+                min="1"
                 name="seats"
                 value={tableData.seats}
                 onChange={handleInputChange}
@@ -98,9 +101,10 @@ const Modal = ({ setIsTableModalOpen }) => {
 
           <button
             type="submit"
+            disabled={tableMutation.isPending}
             className="w-full rounded-lg mt-10 mb-6 py-3 text-lg bg-yellow-400 text-gray-900 font-bold"
           >
-            Add Table
+            {tableMutation.isPending ? "Adding..." : "Add Table"}
           </button>
         </form>
       </motion.div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import restaurant from "../assets/images/restaurant-img.jpg"
 import logo from "../assets/images/logo.png"
 import Register from "../components/auth/Register";
@@ -24,8 +24,8 @@ const Auth = () => {
 
         {/* Quote at bottom */}
         <blockquote className="absolute bottom-10 px-8 mb-10 text-2xl italic text-white">
-          "Serve customers the best food with prompt and friendly service in a
-          welcoming atmosphere, and they’ll keep coming back."
+          &ldquo;Serve customers the best food with prompt and friendly service in a
+          welcoming atmosphere, and they’ll keep coming back.&rdquo;
           <br />
           <span className="block mt-4 text-yellow-400">- Founder of Restro</span>
         </blockquote>
@@ -49,9 +49,9 @@ const Auth = () => {
         <div className="flex justify-center mt-6">
           <p className="text-sm text-[#ababab]">
             {isRegister ? "Already have an account?" : "Don't have an account?"}
-            <a onClick={() => setIsRegister(!isRegister)} className="text-yellow-400 font-semibold hover:underline" href="#">
+            <button type="button" onClick={() => setIsRegister(!isRegister)} className="text-yellow-400 font-semibold hover:underline">
               {isRegister ? "Sign in" : "Sign up"}
-            </a>
+            </button>
           </p>
         </div>
 

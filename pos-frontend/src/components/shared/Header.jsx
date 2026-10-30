@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FaUserCircle } from "react-icons/fa";
 import { FaBell } from "react-icons/fa";
@@ -10,21 +10,22 @@ import { logout } from "../../https";
 import { removeUser } from "../../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
 import { MdDashboard } from "react-icons/md";
+import { enqueueSnackbar } from "notistack";
 
 const Header = () => {
+  const [search, setSearch] = useState("");
   const userData = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const logoutMutation = useMutation({
     mutationFn: () => logout(),
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       dispatch(removeUser());
       navigate("/auth");
     },
     onError: (error) => {
-      console.log(error);
+      enqueueSnackbar(error.response?.data?.message || "Could not log out. Please try again.", { variant: "error" });
     },
   });
 
@@ -32,8 +33,13 @@ const Header = () => {
     logoutMutation.mutate();
   };
 
+  const handleSearch = (event) => {
+    event.preventDefault();
+    navigate(`/orders?search=${encodeURIComponent(search.trim())}`);
+  };
+
   return (
-    <header className="flex justify-between items-center py-4 px-8 bg-[#1a1a1a]">
+    <header className="flex flex-wrap justify-between items-center gap-3 py-4 px-4 md:px-8 bg-[#1a1a1a]">
       {/* LOGO */}
       <div onClick={() => navigate("/")} className="flex items-center gap-2 cursor-pointer">
         <img src={logo} className="h-8 w-8" alt="restro logo" />
@@ -43,14 +49,18 @@ const Header = () => {
       </div>
 
       {/* SEARCH */}
-      <div className="flex items-center gap-4 bg-[#1f1f1f] rounded-[15px] px-5 py-2 w-[500px]">
-        <FaSearch className="text-[#f5f5f5]" />
+      <form onSubmit={handleSearch} className="flex order-3 md:order-none items-center gap-4 bg-[#1f1f1f] rounded-[15px] px-5 py-2 w-full md:w-[min(500px,40vw)]">
+        <button type="submit" className="text-[#f5f5f5]" aria-label="Search orders">
+          <FaSearch />
+        </button>
         <input
           type="text"
-          placeholder="Search"
-          className="bg-[#1f1f1f] outline-none text-[#f5f5f5]"
+          placeholder="Search orders"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="bg-[#1f1f1f] outline-none text-[#f5f5f5] w-full"
         />
-      </div>
+      </form>
 
       {/* LOGGED USER DETAILS */}
       <div className="flex items-center gap-4">
@@ -59,9 +69,14 @@ const Header = () => {
             <MdDashboard className="text-[#f5f5f5] text-2xl" />
           </div>
         )}
-        <div className="bg-[#1f1f1f] rounded-[15px] p-3 cursor-pointer">
+        <button
+          type="button"
+          onClick={() => enqueueSnackbar("You have no new notifications.", { variant: "info" })}
+          aria-label="Notifications"
+          className="bg-[#1f1f1f] rounded-[15px] p-3 text-left"
+        >
           <FaBell className="text-[#f5f5f5] text-2xl" />
-        </div>
+        </button>
         <div className="flex items-center gap-3 cursor-pointer">
           <FaUserCircle className="text-[#f5f5f5] text-4xl" />
           <div className="flex flex-col items-start">
@@ -72,11 +87,9 @@ const Header = () => {
               {userData.role || "Role"}
             </p>
           </div>
-          <IoLogOut
-            onClick={handleLogout}
-            className="text-[#f5f5f5] ml-2"
-            size={40}
-          />
+          <button type="button" onClick={handleLogout} disabled={logoutMutation.isPending} aria-label="Log out" className="ml-2 text-[#f5f5f5] disabled:opacity-50">
+            <IoLogOut size={40} />
+          </button>
         </div>
       </div>
     </header>

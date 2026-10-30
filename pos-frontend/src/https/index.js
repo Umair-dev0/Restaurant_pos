@@ -14,14 +14,26 @@ export const getTables = () => axiosWrapper.get("/api/table");
 export const updateTable = ({ tableId, ...tableData }) =>
   axiosWrapper.put(`/api/table/${tableId}`, tableData);
 
+// Menu Endpoints
+export const getMenu = () => axiosWrapper.get("/api/menu");
+export const addMenuCategory = (data) => axiosWrapper.post("/api/menu/categories", data);
+export const addMenuItem = ({ categoryId, ...data }) =>
+  axiosWrapper.post(`/api/menu/categories/${categoryId}/items`, data);
+export const updateMenuItem = ({ id, ...data }) =>
+  axiosWrapper.patch(`/api/menu/items/${id}`, data);
+export const deleteMenuItem = (id) => axiosWrapper.delete(`/api/menu/items/${id}`);
+
 // Payment Endpoints
 export const createOrderRazorpay = (data) =>
   axiosWrapper.post("/api/payment/create-order", data);
 export const verifyPaymentRazorpay = (data) =>
-  axiosWrapper.post("/api/payment//verify-payment", data);
+  axiosWrapper.post("/api/payment/verify-payment", data);
 
 // Order Endpoints
 export const addOrder = (data) => axiosWrapper.post("/api/order/", data);
 export const getOrders = () => axiosWrapper.get("/api/order");
+export const getOrderQuote = (data) => axiosWrapper.post("/api/order/quote", data);
+export const getOrderStats = (days = 30) =>
+  axiosWrapper.get("/api/order/stats", { params: { days } });
 export const updateOrderStatus = ({ orderId, orderStatus }) =>
   axiosWrapper.put(`/api/order/${orderId}`, { orderStatus });

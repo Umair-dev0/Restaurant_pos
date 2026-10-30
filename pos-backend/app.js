@@ -8,14 +8,28 @@ const app = express();
 
 
 const PORT = config.port;
-connectDB();
+if (!config.accessTokenSecret) {
+    console.error("❌ JWT_SECRET is missing. Create pos-backend/.env and set JWT_SECRET before starting the server.");
+    process.exit(1);
+}
 
 // Middlewares
 app.use(cors({
     credentials: true,
-    origin: ['http://localhost:5173']
+    origin: (origin, callback) => {
+        const configuredOrigin = config.frontendOrigins.includes(origin);
+        const localDevelopmentOrigin = config.nodeEnv !== "production" &&
+            /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin || "");
+        callback(null, !origin || configuredOrigin || localDevelopmentOrigin);
+    }
 }))
-app.use(express.json()); // parse incoming request in json format
+app.use(express.json({
+    verify: (req, res, buffer) => {
+        if (req.originalUrl.startsWith("/api/payment/webhook-verification")) {
+            req.rawBody = Buffer.from(buffer);
+        }
+    }
+}));
 app.use(cookieParser())
 
 
@@ -29,12 +43,24 @@ app.use("/api/user", require("./routes/userRoute"));
 app.use("/api/order", require("./routes/orderRoute"));
 app.use("/api/table", require("./routes/tableRoute"));
 app.use("/api/payment", require("./routes/paymentRoute"));
+app.use("/api/menu", require("./routes/menuRoute"));
 
 // Global Error Handler
 app.use(globalErrorHandler);
 
 
 // Server
-app.listen(PORT, () => {
-    console.log(`☑️  POS Server is listening on port ${PORT}`);
-})
+const startServer = async () => {
+    try {
+        await connectDB();
+        app.listen(PORT, () => {
+            console.log(`☑️  POS Server is listening on port ${PORT}`);
+        });
+    } catch (error) {
+        process.exitCode = 1;
+    }
+};
+
+if (require.main === module) startServer();
+
+module.exports = app;

@@ -1,19 +1,18 @@
 const Table = require("../models/tableModel");
 const createHttpError = require("http-errors");
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const addTable = async (req, res, next) => {
   try {
-    const { tableNo, seats } = req.body;
-    if (!tableNo) {
-      const error = createHttpError(400, "Please provide table No!");
-      return next(error);
+    const tableNo = Number(req.body.tableNo);
+    const seats = Number(req.body.seats);
+    if (!Number.isInteger(tableNo) || tableNo < 1 || !Number.isInteger(seats) || seats < 1) {
+      return next(createHttpError(400, "Provide a valid table number and seat count."));
     }
     const isTablePresent = await Table.findOne({ tableNo });
 
     if (isTablePresent) {
-      const error = createHttpError(400, "Table already exist!");
-      return next(error);
+      return next(createHttpError(409, "Table already exists."));
     }
 
     const newTable = new Table({ tableNo, seats });
@@ -40,25 +39,22 @@ const getTables = async (req, res, next) => {
 
 const updateTable = async (req, res, next) => {
   try {
-    const { status, orderId } = req.body;
-
     const { id } = req.params;
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        const error = createHttpError(404, "Invalid id!");
-        return next(error);
+        return next(createHttpError(404, "Invalid id!"));
+    }
+    if (req.body.status !== "Available") {
+      return next(createHttpError(400, "Tables are booked automatically when an order is placed."));
     }
 
     const table = await Table.findByIdAndUpdate(
-        id,
-      { status, currentOrder: orderId },
+      id,
+      { $set: { status: "Available" }, $unset: { currentOrder: 1 } },
       { new: true }
     );
 
-    if (!table) {
-      const error = createHttpError(404, "Table not found!");
-      return error;
-    }
+    if (!table) return next(createHttpError(404, "Table not found!"));
 
     res.status(200).json({success: true, message: "Table updated!", data: table});
 
