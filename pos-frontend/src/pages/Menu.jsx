@@ -6,15 +6,25 @@ import MenuContainer from "../components/menu/MenuContainer";
 import CustomerInfo from "../components/menu/CustomerInfo";
 import CartInfo from "../components/menu/CartInfo";
 import Bill from "../components/menu/Bill";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useSearchParams } from "react-router-dom";
+import { updateTable } from "../redux/slices/customerSlice";
+import { enqueueSnackbar } from "notistack";
 
 const Menu = () => {
-
-    useEffect(() => {
-      document.title = "POS | Menu"
-    }, [])
-
+  const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
   const customerData = useSelector((state) => state.customer);
+
+  useEffect(() => {
+    document.title = "POS | Menu";
+    const tableId = searchParams.get("tableId");
+    const tableNo = searchParams.get("tableNo");
+    if (tableId && tableNo) {
+      dispatch(updateTable({ table: { tableId, tableNo: Number(tableNo) } }));
+      enqueueSnackbar(`QR Order Mode: Table ${tableNo} auto-selected!`, { variant: "info" });
+    }
+  }, [searchParams, dispatch]);
 
   return (
     <section className="min-h-[calc(100vh-4rem)] bg-[#1f1f1f] flex flex-col lg:flex-row gap-3 pb-20">

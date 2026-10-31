@@ -13,6 +13,11 @@ export const addTable = (data) => axiosWrapper.post("/api/table/", data);
 export const getTables = () => axiosWrapper.get("/api/table");
 export const updateTable = ({ tableId, ...tableData }) =>
   axiosWrapper.put(`/api/table/${tableId}`, tableData);
+export const getTableQrCode = (tableId) => axiosWrapper.get(`/api/table/${tableId}/qrcode`);
+
+// Staff Management (Admin)
+export const createStaffUser = (data) => axiosWrapper.post("/api/user/staff", data);
+export const getAllStaff = () => axiosWrapper.get("/api/user/staff");
 
 // Menu Endpoints
 export const getMenu = () => axiosWrapper.get("/api/menu");
@@ -31,9 +36,21 @@ export const verifyPaymentRazorpay = (data) =>
 
 // Order Endpoints
 export const addOrder = (data) => axiosWrapper.post("/api/order/", data);
-export const getOrders = () => axiosWrapper.get("/api/order");
+export const getOrders = (params) => axiosWrapper.get("/api/order", { params });
 export const getOrderQuote = (data) => axiosWrapper.post("/api/order/quote", data);
 export const getOrderStats = (days = 30) =>
   axiosWrapper.get("/api/order/stats", { params: { days } });
 export const updateOrderStatus = ({ orderId, orderStatus }) =>
   axiosWrapper.put(`/api/order/${orderId}`, { orderStatus });
+export const cancelOrder = (orderId, reason) =>
+  axiosWrapper.put(`/api/order/${orderId}/cancel`, { reason });
+
+// Reservation Endpoints
+export const getReservations = (params) => axiosWrapper.get("/api/reservation", { params });
+export const createReservation = (data) => axiosWrapper.post("/api/reservation", data);
+export const updateReservationStatus = (id, status) =>
+  axiosWrapper.put(`/api/reservation/${id}/status`, { status });
+
+// Inventory Endpoints
+export const getInventory = () => axiosWrapper.get("/api/inventory");
+export const updateStock = (id, data) => axiosWrapper.put(`/api/inventory/${id}`, data);

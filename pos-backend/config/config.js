@@ -1,10 +1,10 @@
 require("dotenv").config({ path: require("path").resolve(__dirname, "../.env") });
 
 const config = Object.freeze({
-    port: process.env.PORT || 8000,
-    databaseURI: process.env.MONGODB_URI || "mongodb://localhost:27017/Restaurant_pos_db",
+    port: process.env.PORT || 3000,
+    databaseURI: process.env.MONGODB_URI || "mongodb+srv://umairsanderwale318_db_user:Umaircs9538%3F@restaurant-pos.dwbgrxd.mongodb.net/Restaurant_pos_db?retryWrites=true&w=majority",
     nodeEnv : process.env.NODE_ENV || "development",
-    accessTokenSecret: process.env.JWT_SECRET,
+    accessTokenSecret: process.env.JWT_SECRET || "pos_jwt_secret_dev_key_fallback_8e0b",
     razorpayKeyId: process.env.RAZORPAY_KEY_ID,
     razorpaySecretKey: process.env.RAZORPAY_KEY_SECRET,
     razorpayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,

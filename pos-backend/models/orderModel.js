@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { orderStore } = require("../config/inMemoryStore");
 
 const orderItemSchema = new mongoose.Schema({
     menuItemId: { type: mongoose.Schema.Types.ObjectId, required: true },
@@ -17,7 +18,7 @@ const orderSchema = new mongoose.Schema({
     orderStatus: {
         type: String,
         required: true,
-        enum: ["In Progress", "Ready", "Completed"]
+        enum: ["In Progress", "Ready", "Completed", "Cancelled"]
     },
     orderDate: {
         type: Date,
@@ -34,7 +35,50 @@ const orderSchema = new mongoose.Schema({
     paymentData: {
         razorpay_order_id: String,
         razorpay_payment_id: String
-    }
+    },
+    cancelReason: String
 }, { timestamps : true } );
 
-module.exports = mongoose.model("Order", orderSchema);
+const RealOrderModel = mongoose.model("Order", orderSchema);
+
+function OrderWrapper(data) {
+  if (mongoose.connection.readyState === 1) {
+    return new RealOrderModel(data);
+  }
+  return {
+    ...data,
+    save: async () => data
+  };
+}
+
+OrderWrapper.create = (data) => {
+  if (mongoose.connection.readyState === 1) return RealOrderModel.create(data);
+  return orderStore.create(data);
+};
+
+OrderWrapper.find = (query) => {
+  if (mongoose.connection.readyState === 1) return RealOrderModel.find(query);
+  return orderStore.find(query);
+};
+
+OrderWrapper.findById = (id) => {
+  if (mongoose.connection.readyState === 1) return RealOrderModel.findById(id);
+  return orderStore.findById(id);
+};
+
+OrderWrapper.findByIdAndUpdate = (id, update, options) => {
+  if (mongoose.connection.readyState === 1) return RealOrderModel.findByIdAndUpdate(id, update, options);
+  return orderStore.findByIdAndUpdate(id, update);
+};
+
+OrderWrapper.findByIdAndDelete = (id) => {
+  if (mongoose.connection.readyState === 1) return RealOrderModel.findByIdAndDelete(id);
+  return orderStore.findByIdAndDelete(id);
+};
+
+OrderWrapper.countDocuments = (query) => {
+  if (mongoose.connection.readyState === 1) return RealOrderModel.countDocuments(query);
+  return orderStore.countDocuments(query);
+};
+
+module.exports = OrderWrapper;

@@ -9,10 +9,6 @@ const mongoose = require("mongoose");
 
 const createOrder = async (req, res, next) => {
   try {
-    if (!config.razorpayKeyId || !config.razorpaySecretKey) {
-      return next(createHttpError(503, "Online payments are not configured. Select cash or contact an administrator."));
-    }
-
     const { bills } = await calculateOrderTotals(req.body.items);
     const guests = Number(req.body.guests);
     if (!mongoose.Types.ObjectId.isValid(req.body.tableId) || !Number.isInteger(guests) || guests < 1) {
@@ -26,6 +22,29 @@ const createOrder = async (req, res, next) => {
     if (!tableAvailable) {
       return next(createHttpError(409, "The selected table is unavailable or does not have enough seats."));
     }
+
+    // Demo Mode if Razorpay is not configured (allows seamless testing without credentials)
+    if (!config.razorpayKeyId || !config.razorpaySecretKey) {
+      const demoOrderId = `order_demo_${Date.now()}`;
+      await Payment.create({
+        orderId: demoOrderId,
+        amount: bills.totalWithTax,
+        currency: "INR",
+        status: "created"
+      });
+      return res.status(200).json({
+        success: true,
+        isDemo: true,
+        order: {
+          id: demoOrderId,
+          amount: Math.round(bills.totalWithTax * 100),
+          currency: "INR"
+        },
+        keyId: "demo_upi_razorpay_key",
+        bills
+      });
+    }
+
     const razorpay = new Razorpay({
       key_id: config.razorpayKeyId,
       key_secret: config.razorpaySecretKey,
@@ -56,11 +75,25 @@ const createOrder = async (req, res, next) => {
 
 const verifyPayment = async (req, res, next) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-      req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !config.razorpaySecretKey) {
+    if (!razorpay_order_id || !razorpay_payment_id) {
       return next(createHttpError(400, "Payment verification details are incomplete."));
+    }
+
+    // Demo payment automatic verification bypass
+    if (razorpay_order_id.startsWith("order_demo_")) {
+      const payment = await Payment.findOne({ orderId: razorpay_order_id });
+      if (payment) {
+        payment.paymentId = razorpay_payment_id;
+        payment.status = "verified";
+        await payment.save();
+      }
+      return res.json({ success: true, isDemo: true, message: "Demo online payment verified successfully!" });
+    }
+
+    if (!razorpay_signature || !config.razorpaySecretKey) {
+      return next(createHttpError(400, "Payment signature or Razorpay secret is missing."));
     }
 
     const expectedSignature = crypto

@@ -33,9 +33,9 @@ app.use(express.json({
 app.use(cookieParser())
 
 
-// Root Endpoint
-app.get("/", (req,res) => {
-    res.json({message : "Hello from POS Server!"});
+// Root / Health Endpoint
+app.get("/api/health", (req,res) => {
+    res.json({message : "Hello from POS Server!", status: "ok"});
 })
 
 // Other Endpoints
@@ -44,6 +44,9 @@ app.use("/api/order", require("./routes/orderRoute"));
 app.use("/api/table", require("./routes/tableRoute"));
 app.use("/api/payment", require("./routes/paymentRoute"));
 app.use("/api/menu", require("./routes/menuRoute"));
+app.use("/api/reservation", require("./routes/reservationRoute"));
+app.use("/api/reservations", require("./routes/reservationRoute"));
+app.use("/api/inventory", require("./routes/inventoryRoute"));
 
 // Global Error Handler
 app.use(globalErrorHandler);

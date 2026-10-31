@@ -76,34 +76,80 @@ const MenuContainer = () => {
       <hr className="border-[#2a2a2a] border-t-2 mt-4" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 px-4 md:px-10 py-4 w-full">
-        {selected?.items.map((item) => (
-          <div
-            key={item._id}
-            className="flex flex-col items-start justify-between p-4 rounded-lg min-h-[150px] bg-[#1a1a1a]"
-          >
-            <div className="flex items-start justify-between w-full gap-3">
-              <h2 className="text-[#f5f5f5] text-lg font-semibold">{item.name}</h2>
-              <button
-                type="button"
-                onClick={() => handleAddToCart(item)}
-                className="bg-[#2e4a40] text-[#02ca3a] p-2 rounded-lg"
-                aria-label={`Add one ${item.name} to cart`}
-              >
-                <FaShoppingCart size={20} />
-              </button>
-            </div>
-            <div className="flex items-center justify-between w-full gap-3">
-              <p className="text-[#f5f5f5] text-xl font-bold">₹{Number(item.price).toFixed(2)}</p>
-              <div className="flex items-center justify-between bg-[#1f1f1f] px-3 py-2 rounded-lg gap-4">
-                <button type="button" onClick={() => decrement(item._id)} aria-label={`Remove one ${item.name}`} className="text-yellow-500 text-2xl">−</button>
-                <span className="text-white">
-                  {cartItems.find((cartItem) => cartItem.menuItemId === item._id)?.quantity ?? 0}
-                </span>
-                <button type="button" onClick={() => increment(item._id)} aria-label={`Add one ${item.name}`} className="text-yellow-500 text-2xl">+</button>
+        {selected?.items.map((item) => {
+          const isOutOfStock = item.stockQuantity !== undefined && item.stockQuantity <= 0;
+          const isLowStock = item.stockQuantity !== undefined && item.stockQuantity > 0 && item.stockQuantity <= 10;
+
+          return (
+            <div
+              key={item._id}
+              className={`flex flex-col items-start justify-between p-4 rounded-xl min-h-[160px] bg-[#1a1a1a] border border-zinc-800/80 transition-all ${
+                isOutOfStock ? "opacity-60" : "hover:border-zinc-700"
+              }`}
+            >
+              <div className="flex items-start justify-between w-full gap-3">
+                <div>
+                  <h2 className="text-[#f5f5f5] text-base font-bold leading-tight">{item.name}</h2>
+                  <div className="mt-1">
+                    {isOutOfStock ? (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-950/80 text-rose-400 border border-rose-800">
+                        Out of Stock
+                      </span>
+                    ) : isLowStock ? (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950/80 text-amber-400 border border-amber-800 animate-pulse">
+                        Low Stock: {item.stockQuantity} left
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-zinc-500 font-medium">
+                        {item.category || "Available"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={isOutOfStock}
+                  onClick={() => handleAddToCart(item)}
+                  className={`p-2 rounded-xl transition-all ${
+                    isOutOfStock
+                      ? "bg-zinc-800 text-zinc-600 cursor-not-allowed"
+                      : "bg-[#2e4a40] hover:bg-[#395e52] text-[#02ca3a] active:scale-95 shadow-sm"
+                  }`}
+                  aria-label={`Add one ${item.name} to cart`}
+                >
+                  <FaShoppingCart size={17} />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between w-full gap-3 mt-4">
+                <p className="text-[#f5f5f5] text-lg font-black">₹{Number(item.price).toFixed(2)}</p>
+                <div className="flex items-center justify-between bg-[#1f1f1f] px-3 py-1.5 rounded-xl gap-3 border border-zinc-800">
+                  <button
+                    type="button"
+                    onClick={() => decrement(item._id)}
+                    aria-label={`Remove one ${item.name}`}
+                    className="text-yellow-500 hover:text-yellow-400 text-xl font-black px-1"
+                  >
+                    −
+                  </button>
+                  <span className="text-white font-bold text-sm min-w-[16px] text-center">
+                    {cartItems.find((cartItem) => cartItem.menuItemId === item._id)?.quantity ?? 0}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={isOutOfStock}
+                    onClick={() => increment(item._id)}
+                    aria-label={`Add one ${item.name}`}
+                    className="text-yellow-500 hover:text-yellow-400 text-xl font-black px-1 disabled:opacity-40"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         {!selected?.items.length && <p className="text-[#ababab]">No dishes in this category yet.</p>}
       </div>
     </>

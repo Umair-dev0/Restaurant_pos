@@ -5,7 +5,7 @@ import { CiCircleMore } from "react-icons/ci";
 import { BiSolidDish } from "react-icons/bi";
 import { useNavigate, useLocation } from "react-router-dom";
 import Modal from "./Modal";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCustomer } from "../../redux/slices/customerSlice";
 import { enqueueSnackbar } from "notistack";
 
@@ -43,38 +43,57 @@ const BottomNav = () => {
     navigate("/tables");
   }
 
+  const { role } = useSelector((state) => state.user);
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#262626] p-2 h-16 flex justify-around">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#1c1c1c] border-t border-zinc-800 p-2 h-16 flex justify-around items-center">
       <button
         onClick={() => navigate("/")}
-        className={`flex items-center justify-center font-bold ${
-          isActive("/") ? "text-[#f5f5f5] bg-[#343434]" : "text-[#ababab]"
-        } flex-1 rounded-[20px]`}
+        className={`flex items-center justify-center font-bold text-xs ${
+          isActive("/") ? "text-yellow-400 bg-[#282828]" : "text-[#ababab]"
+        } flex-1 py-2 rounded-xl transition-all`}
       >
-        <FaHome className="inline mr-2" size={20} /> <p>Home</p>
+        <FaHome className="inline mr-1.5" size={17} /> <span>Home</span>
       </button>
+
       <button
         onClick={() => navigate("/orders")}
-        className={`flex items-center justify-center font-bold ${
-          isActive("/orders") ? "text-[#f5f5f5] bg-[#343434]" : "text-[#ababab]"
-        } flex-1 rounded-[20px]`}
+        className={`flex items-center justify-center font-bold text-xs ${
+          isActive("/orders") ? "text-yellow-400 bg-[#282828]" : "text-[#ababab]"
+        } flex-1 py-2 rounded-xl transition-all`}
       >
-        <MdOutlineReorder className="inline mr-2" size={20} /> <p>Orders</p>
+        <MdOutlineReorder className="inline mr-1.5" size={17} />{" "}
+        <span>{role === "Cashier" ? "Billing" : role === "Waiter" ? "KOT Orders" : "Orders"}</span>
       </button>
+
       <button
         onClick={() => navigate("/tables")}
-        className={`flex items-center justify-center font-bold ${
-          isActive("/tables") ? "text-[#f5f5f5] bg-[#343434]" : "text-[#ababab]"
-        } flex-1 rounded-[20px]`}
+        className={`flex items-center justify-center font-bold text-xs ${
+          isActive("/tables") ? "text-yellow-400 bg-[#282828]" : "text-[#ababab]"
+        } flex-1 py-2 rounded-xl transition-all`}
       >
-        <MdTableBar className="inline mr-2" size={20} /> <p>Tables</p>
+        <MdTableBar className="inline mr-1.5" size={17} /> <span>Tables</span>
       </button>
-      <button
-        onClick={() => enqueueSnackbar("More options are coming soon.", { variant: "info" })}
-        className="flex items-center justify-center font-bold text-[#ababab] flex-1 rounded-[20px]"
-      >
-        <CiCircleMore className="inline mr-2" size={20} /> <p>More</p>
-      </button>
+
+      {role === "Admin" ? (
+        <button
+          onClick={() => navigate("/dashboard")}
+          className={`flex items-center justify-center font-bold text-xs ${
+            isActive("/dashboard") ? "text-yellow-400 bg-[#282828]" : "text-[#ababab]"
+          } flex-1 py-2 rounded-xl transition-all`}
+        >
+          <BiSolidDish className="inline mr-1.5" size={17} /> <span>Admin</span>
+        </button>
+      ) : (
+        <button
+          onClick={() => navigate("/menu")}
+          className={`flex items-center justify-center font-bold text-xs ${
+            isActive("/menu") ? "text-yellow-400 bg-[#282828]" : "text-[#ababab]"
+          } flex-1 py-2 rounded-xl transition-all`}
+        >
+          <BiSolidDish className="inline mr-1.5" size={17} /> <span>Menu</span>
+        </button>
+      )}
 
       <button
         disabled={isActive("/tables") || isActive("/menu")}

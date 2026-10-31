@@ -1,0 +1,5 @@
+{
+  "name": "Restro POS - Restaurant Management System",
+  "description": "A full-stack Restaurant Point of Sale (POS) system for table management, live orders, menu catalog, billing, and staff operations.",
+  "major_capability_server_side_gemini_api": false
+}

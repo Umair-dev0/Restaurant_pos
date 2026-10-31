@@ -124,21 +124,24 @@ const Register = ({setIsRegister}) => {
           </label>
 
           <div className="flex item-center gap-3 mt-4">
-            {["Waiter", "Cashier", "Admin"].map((role) => {
+            {["Waiter", "Cashier"].map((role) => {
               return (
                 <button
                   key={role}
                   type="button"
                   onClick={() => handleRoleSelection(role)}
-                  className={`bg-[#1f1f1f] px-4 py-3 w-full rounded-lg text-[#ababab] ${
-                    formData.role === role ? "bg-indigo-700" : ""
+                  className={`bg-[#1f1f1f] px-4 py-3 w-full rounded-lg text-[#ababab] font-medium border border-transparent transition-all ${
+                    formData.role === role ? "!bg-yellow-400 !text-black font-semibold shadow-md" : "hover:border-zinc-700"
                   }`}
                 >
-                  {role}
+                  {role === "Waiter" ? "🍽️ Waiter" : "💵 Cashier"}
                 </button>
               );
             })}
           </div>
+          <p className="text-xs text-zinc-500 mt-2">
+            🛡️ Security policy: Admin accounts can only be created by existing system administrators.
+          </p>
         </div>
 
         <button

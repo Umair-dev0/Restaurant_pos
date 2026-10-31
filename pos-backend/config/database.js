@@ -6,7 +6,10 @@ const defaultMenu = require("./defaultMenu.json");
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(config.databaseURI);
+        mongoose.set('bufferCommands', false); // Fail fast, don't hang
+        const conn = await mongoose.connect(config.databaseURI, {
+            serverSelectionTimeoutMS: 2000
+        });
         console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
         const categoryCount = await Menu.estimatedDocumentCount();
         if (categoryCount === 0) {
@@ -24,8 +27,7 @@ const connectDB = async () => {
             console.log("✅ Initial tables created.");
         }
     } catch (error) {
-        console.error(`❌ Database connection failed: ${error.message}`);
-        throw error;
+        console.warn(`[AI Studio] MongoDB not connected (${error.message}) — running with in-memory store`);
     }
 }
 

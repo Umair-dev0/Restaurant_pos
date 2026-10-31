@@ -23,14 +23,30 @@ const Greetings = () => {
       date.getMinutes()
     ).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
 
+  const getGreeting = () => {
+    const hour = dateTime.getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
+
   return (
     <div className="flex justify-between items-center px-8 mt-5">
       <div>
-        <h1 className="text-[#f5f5f5] text-2xl font-semibold tracking-wide">
-          Good Morning, {userData.name || "TEST USER"}
-        </h1>
-        <p className="text-[#ababab] text-sm">
-          Give your best services for customers 😀
+        <div className="flex items-center gap-2">
+          <h1 className="text-[#f5f5f5] text-2xl font-bold tracking-wide">
+            {getGreeting()}, {userData.name || "Staff Member"}
+          </h1>
+          <span className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-yellow-400 text-zinc-950 uppercase">
+            {userData.role || "Staff"}
+          </span>
+        </div>
+        <p className="text-zinc-400 text-xs mt-1">
+          {userData.role === "Admin"
+            ? "👑 Master Management Console • Oversee orders, revenue, tables & kitchen stock."
+            : userData.role === "Cashier"
+            ? "💵 Cashier Billing Terminal • Settle bills, receive payments and generate tax invoices."
+            : "🍽️ Floor Service Mode • Manage dining tables, take customer orders, and update kitchen tickets."}
         </p>
       </div>
       <div>

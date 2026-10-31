@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema({
     name : {
@@ -56,4 +56,44 @@ userSchema.pre('save', async function () {
     this.password = await bcrypt.hash(this.password, salt);
 })
 
-module.exports = mongoose.model("User", userSchema);
+const RealUserModel = mongoose.model("User", userSchema);
+const { userStore } = require("../config/inMemoryStore");
+
+function UserWrapper(data) {
+  if (mongoose.connection.readyState === 1) {
+    return new RealUserModel(data);
+  }
+  return {
+    ...data,
+    save: async () => {
+      const created = await userStore.create(data);
+      Object.assign(this, created);
+      return created;
+    },
+    toObject: () => ({ ...data })
+  };
+}
+
+UserWrapper.findOne = (query) => {
+  if (mongoose.connection.readyState === 1) return RealUserModel.findOne(query);
+  return userStore.findOne(query);
+};
+
+UserWrapper.findById = (id) => {
+  if (mongoose.connection.readyState === 1) return RealUserModel.findById(id);
+  return userStore.findById(id);
+};
+
+UserWrapper.find = () => {
+  if (mongoose.connection.readyState === 1) return RealUserModel.find();
+  const p = Promise.resolve(userStore.find());
+  p.select = () => Promise.resolve(userStore.find());
+  return p;
+};
+
+UserWrapper.create = (data) => {
+  if (mongoose.connection.readyState === 1) return RealUserModel.create(data);
+  return userStore.create(data);
+};
+
+module.exports = UserWrapper;

@@ -1,6 +1,6 @@
 const createHttpError = require("http-errors");
 const User = require("../models/userModel");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
 
@@ -25,27 +25,80 @@ const register = async (req, res, next) => {
             return next(error);
         }
 
-        const normalizedEmail = email.trim().toLowerCase();
-        const isUserPresent = await User.findOne({ email: normalizedEmail });
-        if(isUserPresent){
-            const error = createHttpError(400, "User already exist!");
+        // SECURITY FIX: Prevent public registration from assigning Admin role
+        const sanitizedRole = role.trim();
+        if (sanitizedRole === "Admin") {
+            const error = createHttpError(403, "Public registration cannot create Admin accounts. Only an existing Administrator can create Admin users.");
+            return next(error);
+        }
+        if (!["Waiter", "Cashier"].includes(sanitizedRole)) {
+            const error = createHttpError(400, "Invalid role. Public registration only allows Waiter or Cashier.");
             return next(error);
         }
 
+        const normalizedEmail = email.trim().toLowerCase();
+        const isUserPresent = await User.findOne({ email: normalizedEmail });
+        if(isUserPresent){
+            const error = createHttpError(400, "User already exists!");
+            return next(error);
+        }
 
-        const user = { name: name.trim(), phone: phone.toString().trim(), email: normalizedEmail, password, role };
+        const user = { name: name.trim(), phone: phone.toString().trim(), email: normalizedEmail, password, role: sanitizedRole };
         const newUser = User(user);
         await newUser.save();
 
-        const publicUser = newUser.toObject();
+        const publicUser = newUser.toObject ? newUser.toObject() : { ...newUser };
         delete publicUser.password;
-        res.status(201).json({success: true, message: "New user created!", data: publicUser});
-
+        res.status(201).json({success: true, message: "New employee account created!", data: publicUser});
 
     } catch (error) {
         next(error);
     }
 }
+
+// Admin-only Staff Creation endpoint
+const createStaffUser = async (req, res, next) => {
+    try {
+        const { name, phone, email, password, role } = req.body || {};
+        if (!name?.trim() || !phone || !email?.trim() || !password || !role) {
+            return next(createHttpError(400, "All staff fields (name, phone, email, password, role) are required."));
+        }
+        if (!["Admin", "Waiter", "Cashier"].includes(role)) {
+            return next(createHttpError(400, "Role must be Admin, Waiter, or Cashier."));
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const isUserPresent = await User.findOne({ email: normalizedEmail });
+        if (isUserPresent) {
+            return next(createHttpError(400, "User already exists with this email!"));
+        }
+
+        const user = { name: name.trim(), phone: String(phone).trim(), email: normalizedEmail, password, role };
+        const newUser = User(user);
+        await newUser.save();
+
+        const publicUser = newUser.toObject ? newUser.toObject() : { ...newUser };
+        delete publicUser.password;
+        res.status(201).json({ success: true, message: `${role} account created successfully!`, data: publicUser });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getAllStaff = async (req, res, next) => {
+    try {
+        const { userStore } = require("../config/inMemoryStore");
+        let staffList;
+        if (typeof User.find === "function") {
+            staffList = await User.find().select("-password");
+        } else {
+            staffList = await userStore.find();
+        }
+        res.status(200).json({ success: true, data: staffList });
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 const login = async (req, res, next) => {
@@ -83,9 +136,14 @@ const login = async (req, res, next) => {
             secure: true
         })
 
-        const publicUser = isUserPresent.toObject();
+        const publicUser = isUserPresent.toObject ? isUserPresent.toObject() : { ...isUserPresent };
         delete publicUser.password;
-        res.status(200).json({success: true, message: "User login successfully!", data: publicUser});
+        res.status(200).json({
+            success: true,
+            message: "User login successfully!",
+            token: accessToken,
+            data: publicUser
+        });
 
 
     } catch (error) {
@@ -124,4 +182,4 @@ const logout = async (req, res, next) => {
 
 
 
-module.exports = { register, login, getUserData, logout }
+module.exports = { register, login, getUserData, logout, createStaffUser, getAllStaff };

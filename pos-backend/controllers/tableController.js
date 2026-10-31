@@ -63,4 +63,46 @@ const updateTable = async (req, res, next) => {
   }
 };
 
-module.exports = { addTable, getTables, updateTable };
+const QRCode = require("qrcode");
+
+const getTableQrCode = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    let table;
+    if (typeof Table.findById === "function") {
+      table = await Table.findById(id);
+    } else {
+      const { tableStore } = require("../config/inMemoryStore");
+      table = await tableStore.findOne({ _id: id });
+    }
+
+    if (!table) return next(createHttpError(404, "Table not found!"));
+
+    const host = req.get("host") || "localhost:3000";
+    const protocol = req.secure || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
+    const orderUrl = `${protocol}://${host}/menu?tableId=${table._id}&tableNo=${table.tableNo}`;
+
+    const qrDataUrl = await QRCode.toDataURL(orderUrl, {
+      width: 350,
+      margin: 2,
+      color: {
+        dark: "#1a1a1a",
+        light: "#ffffff"
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        tableId: table._id,
+        tableNo: table.tableNo,
+        orderUrl,
+        qrCode: qrDataUrl
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { addTable, getTables, updateTable, getTableQrCode };
